@@ -47,7 +47,7 @@ app.listen(3000, () => {
 FetchStrings
 
 ```typescript
-import FetchStrings from "../src/fetchstrings";
+import FetchStrings from "fetchstrings";
 
 const fetchStrings = new FetchStrings("http://localhost:3000", "en");
 
