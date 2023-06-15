@@ -6,9 +6,19 @@
   "scripts": {
     "test": "ts-mocha test/**/*.spec.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/smiilliin/fetchstrings"
+  },
+  "keywords": [
+    "front-end",
+    "back-end",
+    "express",
+    "http",
+    "fetch",
+    "web"
+  ],
+  "author": "smiilliin",
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/mocha": "^10.0.1",
