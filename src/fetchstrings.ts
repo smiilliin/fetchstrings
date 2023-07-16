@@ -6,6 +6,9 @@ interface IError {
 interface IStrings {
   [key: string]: string;
 }
+interface IData {
+  [key: string]: any;
+}
 
 class FetchStrings {
   host: string;
@@ -72,40 +75,33 @@ class FetchStrings {
   async fetchStrings(path: string, option: RequestInit): Promise<IError | any> {
     if (!this.loaded) throw new Error(this.strings["UNKNOWN_ERROR"]);
 
-    try {
-      const res = await fetch(`${this.host}${path}`, option);
-      let data: IError | any;
+    const res = await fetch(`${this.host}${path}`, option);
+    let data: IError | any;
 
-      if (res.headers.get("content-type")?.includes("application/json")) {
+    if (res.headers.get("content-type")?.includes("application/json")) {
+      try {
         data = await res.json();
-      } else {
+      } catch (err: any) {
+        throw new Error(this.strings["UNKNOWN_ERROR"]);
+      }
+    } else {
+      throw new Error(this.strings["UNKNOWN_ERROR"]);
+    }
+
+    if (!res.ok) {
+      const { reason } = data as IError;
+
+      const reasonText = this.strings[reason];
+
+      if (!reasonText) {
         throw new Error(this.strings["UNKNOWN_ERROR"]);
       }
 
-      if (!res.ok) {
-        const { reason } = data as IError;
-
-        const reasonText = this.strings[reason];
-
-        if (!reasonText) {
-          throw new Error(this.strings["UNKNOWN_ERROR"]);
-        }
-
-        throw new Error(this.strings[reason]);
-      } else {
-        return data;
-      }
-    } catch (err: any) {
-      if (err.message) {
-        throw new Error(err.message);
-      } else {
-        throw new Error(this.strings["UNKNOWN_ERROR"]);
-      }
+      throw new Error(this.strings[reason]);
+    } else {
+      return data;
     }
   }
-}
-interface IData {
-  [key: string]: string;
 }
 
 class BaseAPI {
@@ -128,18 +124,14 @@ class BaseAPI {
   }
   private async sendToBody(path: string, data: IData, option: RequestInit) {
     option.body = JSON.stringify(data);
+    option.headers = {
+      "Content-Type": "application/json",
+    };
     return this.strings.fetchStrings(path, option);
   }
   private async sendToURL(path: string, data: IData, option: RequestInit) {
-    let url = path + "?";
-    const searchParams = new Array();
-    Object.keys(data).forEach((key) => {
-      const value = data[key];
-      searchParams.push(`${key}=${encodeURI(value)}`);
-    });
-    url += searchParams.join("&");
-
-    return this.strings.fetchStrings(url, option);
+    path = path + "?" + new URLSearchParams(data).toString();
+    return this.strings.fetchStrings(path, option);
   }
   /**
    * GET request

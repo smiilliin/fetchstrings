@@ -14,7 +14,7 @@ strings/en.json
 Strings server
 
 ```typescript
-import Strings from "fetchstrings/dist/strings";
+import { Strings } from "fetchstrings";
 import express from "express";
 
 const app = express();
@@ -55,13 +55,38 @@ const fetchStrings = new FetchStrings("http://localhost:3000");
   await fetchStrings.loadStrings("en");
 
   try {
-    fetchStrings.fetchStrings("/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: "test" }),
-    });
+    console.log(
+      await fetchStrings.fetchStrings("/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: "test" }),
+      })
+    );
+  } catch (err) {
+    console.log(err);
+  }
+})();
+```
+
+BaseAPI
+
+```typescript
+import { BaseAPI, Strings } from "./fetchstrings";
+
+class TestAPI extends BaseAPI {
+  async index(id: string) {
+    return this.post("/", { id: id });
+  }
+}
+
+(async () => {
+  const testAPI = new TestAPI("http://localhost:3000");
+  await testAPI.load("en");
+
+  try {
+    console.log(await testAPI.index("test"));
   } catch (err) {
     console.log(err);
   }
