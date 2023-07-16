@@ -1,11 +1,16 @@
+import Strings from "./strings";
+
 interface IError {
   reason: string;
+}
+interface IStrings {
+  [key: string]: string;
 }
 
 class FetchStrings {
   host: string;
-  lang: string;
-  strings: any;
+  lang: string = "en";
+  strings: IStrings;
 
   /**
    * FetchStriings constructor
@@ -13,40 +18,46 @@ class FetchStrings {
    * @param lang string language
    * @param loadStrings boolean whether to load strings
    */
-  constructor(host: string, lang: string, loadStrings: boolean = false) {
+  constructor(host: string) {
     this.host = host;
-    this.lang = lang;
     this.strings = {
       UNKNOWN_ERROR: "An unknown error has occurred.",
     };
-
-    if (loadStrings) {
-      this.loadStrings();
-    }
   }
-  /**
-   * Load strings
-   */
-  async loadStrings() {
-    return new Promise<void>((resolve) => {
-      fetch(`${this.host}/strings/${this.lang}.json`)
+  private async loadStringsRaw(lang: string): Promise<IStrings> {
+    return new Promise<IStrings>((resolve) => {
+      fetch(`${this.host}/strings/${lang}.json`)
         .then(async (res) => {
-          if (
-            res.ok &&
-            res.headers.get("content-type")?.includes("application/json")
-          ) {
-            const data = await res.json();
+          if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
+            const strings = await res.json();
 
-            this.strings = data;
+            resolve(strings);
           }
+          resolve({});
         })
         .catch((err) => {
           console.error(err);
-        })
-        .finally(() => {
-          resolve();
+          resolve({});
         });
     });
+  }
+  /**
+   * load strings
+   * @param lang to load language
+   * @returns promise
+   */
+  async loadStrings(lang: string): Promise<void> {
+    let strings = await this.loadStringsRaw(lang);
+    if (Object.keys(strings).length != 0) {
+      this.strings = strings;
+      return;
+    } else {
+      lang = "en";
+      strings = await this.loadStringsRaw(lang);
+    }
+    if (Object.keys(strings).length != 0) {
+      this.strings = strings;
+    }
   }
   /**
    * Fetch with response strings
@@ -91,4 +102,4 @@ class FetchStrings {
 }
 
 export default FetchStrings;
-export { IError };
+export { IError, Strings };

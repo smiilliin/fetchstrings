@@ -52,14 +52,20 @@ describe("Fetchstrings test", () => {
   });
   let koFetch: FetchStrings;
   let enFetch: FetchStrings;
+  let wrongFetch: FetchStrings;
 
   it("FetchStrings - ko", async () => {
-    koFetch = new FetchStrings(`http://localhost:${port}`, "ko");
-    await koFetch.loadStrings();
+    koFetch = new FetchStrings(`http://localhost:${port}`);
+
+    await koFetch.loadStrings("ko");
   });
   it("FetchStrings - en", async () => {
-    enFetch = new FetchStrings(`http://localhost:${port}`, "en");
-    await enFetch.loadStrings();
+    enFetch = new FetchStrings(`http://localhost:${port}`);
+    await enFetch.loadStrings("en");
+  });
+  it("FetchStrings - wrong language", async () => {
+    wrongFetch = new FetchStrings(`http://localhost:${port}`);
+    await wrongFetch.loadStrings("wrong");
   });
 
   const throwsError = async (callback: () => Promise<any>) => {

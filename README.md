@@ -49,10 +49,10 @@ FetchStrings
 ```typescript
 import FetchStrings from "fetchstrings";
 
-const fetchStrings = new FetchStrings("http://localhost:3000", "en");
+const fetchStrings = new FetchStrings("http://localhost:3000");
 
 (async () => {
-  await fetchStrings.loadStrings();
+  await fetchStrings.loadStrings("en");
 
   try {
     fetchStrings.fetchStrings("/", {
