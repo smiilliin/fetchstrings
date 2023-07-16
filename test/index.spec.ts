@@ -1,14 +1,32 @@
 import Strings from "../src/strings";
-import FetchStrings from "../src/fetchstrings";
-import express from "express";
+import FetchStrings, { BaseAPI } from "../src/fetchstrings";
+import express, { Response } from "express";
 import assert from "assert";
+import en from "./strings/en.json";
+
+interface IError {
+  reason: keyof typeof en;
+}
+interface IData {
+  data: string;
+}
 
 describe("Fetchstrings test", () => {
   const app = express();
 
   app.use(express.json());
 
-  app.post("/welcome", (req, res) => {
+  app.get("/admin", (req, res: Response<IError | IData>) => {
+    const { name } = req.query;
+
+    if (name == "smile") {
+      return res.status(200).send({ data: "hello!" });
+    }
+    res.status(400).send({
+      reason: "NOT_ADMIN",
+    });
+  });
+  app.post("/welcome", (req, res: Response<IError | IData>) => {
     const { name } = req.body;
 
     if (name == "smile") {
@@ -18,7 +36,7 @@ describe("Fetchstrings test", () => {
     }
     res.status(200).send({ data: "hello!" });
   });
-  app.post("/iq", (req, res) => {
+  app.post("/iq", (req, res: Response<IError | IData>) => {
     const { name } = req.body;
     if (name == "smile") {
       return res.status(400).send({
@@ -68,10 +86,10 @@ describe("Fetchstrings test", () => {
     await wrongFetch.loadStrings("wrong");
   });
 
-  const throwsError = async (callback: () => Promise<any>) => {
+  const throwsError = async (callback: Promise<any>) => {
     let error = false;
     try {
-      await callback();
+      await callback;
     } catch {
       error = true;
     }
@@ -80,24 +98,24 @@ describe("Fetchstrings test", () => {
   };
 
   it("Fetch test1 - ko", async () => {
-    const throwsError1 = await throwsError(async () => {
-      await koFetch.fetchStrings("/welcome", {
+    const throwsError1 = await throwsError(
+      koFetch.fetchStrings("/welcome", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: "smile" }),
-      });
-    });
-    const throwsError2 = await throwsError(async () => {
-      await koFetch.fetchStrings("/iq", {
+      })
+    );
+    const throwsError2 = await throwsError(
+      koFetch.fetchStrings("/iq", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: "smile" }),
-      });
-    });
+      })
+    );
     assert(throwsError1);
     assert(throwsError2);
   });
@@ -120,24 +138,24 @@ describe("Fetchstrings test", () => {
     assert(data2);
   });
   it("Fetch test1 - en", async () => {
-    const throwsError1 = await throwsError(async () => {
-      await enFetch.fetchStrings("/welcome", {
+    const throwsError1 = await throwsError(
+      enFetch.fetchStrings("/welcome", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: "smile" }),
-      });
-    });
-    const throwsError2 = await throwsError(async () => {
-      await enFetch.fetchStrings("/iq", {
+      })
+    );
+    const throwsError2 = await throwsError(
+      enFetch.fetchStrings("/iq", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: "smile" }),
-      });
-    });
+      })
+    );
     assert(throwsError1);
     assert(throwsError2);
   });
@@ -158,6 +176,29 @@ describe("Fetchstrings test", () => {
     });
     assert(data1);
     assert(data2);
+  });
+
+  class TestAPI extends BaseAPI {
+    constructor(host: string) {
+      super(host);
+    }
+    async admin(name: string) {
+      return this.get("/admin", { name: name });
+    }
+    async welcome(name: string) {
+      return this.get("/welcome", { name: name });
+    }
+  }
+  let testAPI: TestAPI;
+  it("TestAPI load", async () => {
+    testAPI = new TestAPI(`http://localhost:${port}`);
+    await testAPI.load("ko");
+  });
+  it("TestAPI admin", async () => {
+    assert(await testAPI.admin("smile"));
+  });
+  it("TestAPI welcome", async () => {
+    assert(await throwsError(testAPI.welcome("smile")));
   });
 
   it("Close express server", () => {

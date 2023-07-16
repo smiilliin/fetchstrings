@@ -1,5 +1,6 @@
 {
   "UNKNOWN_ERROR": "An unknown error has occurred.",
   "SO_BEAUTIFUL_ERROR": "You're so beautiful!",
-  "I'M_FOOL_ERROR": "I'm fool!"
+  "I'M_FOOL_ERROR": "I'm fool!",
+  "NOT_ADMIN": "You're not a admin!"
 }

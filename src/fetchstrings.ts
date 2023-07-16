@@ -11,6 +11,7 @@ class FetchStrings {
   host: string;
   lang: string = "en";
   strings: IStrings;
+  loaded: boolean;
 
   /**
    * FetchStriings constructor
@@ -23,7 +24,9 @@ class FetchStrings {
     this.strings = {
       UNKNOWN_ERROR: "An unknown error has occurred.",
     };
+    this.loaded = false;
   }
+
   private async loadStringsRaw(lang: string): Promise<IStrings> {
     return new Promise<IStrings>((resolve) => {
       fetch(`${this.host}/strings/${lang}.json`)
@@ -50,14 +53,15 @@ class FetchStrings {
     let strings = await this.loadStringsRaw(lang);
     if (Object.keys(strings).length != 0) {
       this.strings = strings;
-      return;
     } else {
       lang = "en";
       strings = await this.loadStringsRaw(lang);
+
+      if (Object.keys(strings).length != 0) {
+        this.strings = strings;
+      }
     }
-    if (Object.keys(strings).length != 0) {
-      this.strings = strings;
-    }
+    this.loaded = true;
   }
   /**
    * Fetch with response strings
@@ -66,6 +70,8 @@ class FetchStrings {
    * @returns response data or UNKNOWN ERROR
    */
   async fetchStrings(path: string, option: RequestInit): Promise<IError | any> {
+    if (!this.loaded) throw new Error(this.strings["UNKNOWN_ERROR"]);
+
     try {
       const res = await fetch(`${this.host}${path}`, option);
       let data: IError | any;
@@ -73,9 +79,7 @@ class FetchStrings {
       if (res.headers.get("content-type")?.includes("application/json")) {
         data = await res.json();
       } else {
-        data = {
-          reason: "UNKNOWN_ERROR",
-        };
+        throw new Error(this.strings["UNKNOWN_ERROR"]);
       }
 
       if (!res.ok) {
@@ -100,6 +104,92 @@ class FetchStrings {
     }
   }
 }
+interface IData {
+  [key: string]: string;
+}
+
+class BaseAPI {
+  strings: FetchStrings;
+
+  /**
+   * Initialize
+   * @param host
+   */
+  constructor(host: string) {
+    this.strings = new FetchStrings(host);
+  }
+
+  /**
+   * Load fetchstrings
+   * @param lang language
+   */
+  async load(lang: string) {
+    return this.strings.loadStrings(lang);
+  }
+  private async sendToBody(path: string, data: IData, option: RequestInit) {
+    option.body = JSON.stringify(data);
+    return this.strings.fetchStrings(path, option);
+  }
+  private async sendToURL(path: string, data: IData, option: RequestInit) {
+    let url = path + "?";
+    const searchParams = new Array();
+    Object.keys(data).forEach((key) => {
+      const value = data[key];
+      searchParams.push(`${key}=${encodeURI(value)}`);
+    });
+    url += searchParams.join("&");
+
+    return this.strings.fetchStrings(url, option);
+  }
+  /**
+   * GET request
+   * @param path path
+   * @param data data
+   * @param option request option
+   * @returns data
+   */
+  protected async get(path: string, data: IData, option?: RequestInit) {
+    option = option ? option : {};
+    option.method = "GET";
+    return this.sendToURL(path, data, option);
+  }
+  /**
+   * POST request
+   * @param path path
+   * @param data data
+   * @param option request option
+   * @returns data
+   */
+  protected async post(path: string, data: IData, option?: RequestInit) {
+    option = option ? option : {};
+    option.method = "POST";
+    return this.sendToBody(path, data, option);
+  }
+  /**
+   * PUT request
+   * @param path path
+   * @param data data
+   * @param option request option
+   * @returns data
+   */
+  protected async put(path: string, data: IData, option?: RequestInit) {
+    option = option ? option : {};
+    option.method = "PUT";
+    return this.sendToBody(path, data, option);
+  }
+  /**
+   * DELETE request
+   * @param path path
+   * @param data data
+   * @param option request option
+   * @returns data
+   */
+  protected async delete(path: string, data: IData, option?: RequestInit) {
+    option = option ? option : {};
+    option.method = "DELETE";
+    return this.sendToBody(path, data, option);
+  }
+}
 
 export default FetchStrings;
-export { IError, Strings };
+export { IError, Strings, BaseAPI };

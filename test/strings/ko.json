@@ -1,5 +1,6 @@
 {
   "UNKNOWN_ERROR": "알 수 없는 오류가 발생했습니다.",
   "SO_BEAUTIFUL_ERROR": "넌 너무 이뻐!",
-  "I'M_FOOL_ERROR": "난 바보야!"
+  "I'M_FOOL_ERROR": "난 바보야!",
+  "NOT_ADMIN": "너는 어드민이 아니야!"
 }
