@@ -34,7 +34,10 @@ class FetchStrings {
     return new Promise<IStrings>((resolve) => {
       fetch(`${this.host}/strings/${lang}.json`)
         .then(async (res) => {
-          if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
+          if (
+            res.ok &&
+            res.headers.get("content-type")?.includes("application/json")
+          ) {
             const strings = await res.json();
 
             resolve(strings);
@@ -73,7 +76,7 @@ class FetchStrings {
    * @returns response data or UNKNOWN ERROR
    */
   async fetchStrings(path: string, option: RequestInit): Promise<IError | any> {
-    if (!this.loaded) throw new Error(this.strings["UNKNOWN_ERROR"]);
+    if (!this.loaded) console.log("Fetchstring Warning: this class not loaded");
 
     const res = await fetch(`${this.host}${path}`, option);
     let data: IError | any;
