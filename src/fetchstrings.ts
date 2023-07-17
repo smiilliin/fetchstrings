@@ -187,4 +187,4 @@ class BaseAPI {
 }
 
 export default FetchStrings;
-export { IError, Strings, BaseAPI };
+export { IError, BaseAPI };

@@ -14,7 +14,7 @@ strings/en.json
 Strings server
 
 ```typescript
-import { Strings } from "fetchstrings";
+import Strings from "fetchstrings/dist/strings";
 import express from "express";
 
 const app = express();
