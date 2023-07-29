@@ -45,6 +45,10 @@ describe("Fetchstrings test", () => {
     }
     res.status(200).send({ data: "wow!" });
   });
+  app.post("/token", (req, res: Response<IError | IData>) => {
+    const token = req.headers.authorization;
+    res.status(200).send({ data: token || "" });
+  });
 
   const strings = new Strings("./test/strings");
 
@@ -188,6 +192,9 @@ describe("Fetchstrings test", () => {
     async welcome(name: string) {
       return this.get("/welcome", { name: name });
     }
+    async token(token: string): Promise<IData> {
+      return this.post("/token", {}, { headers: { authorization: token } });
+    }
   }
   let testAPI: TestAPI;
   it("TestAPI load", async () => {
@@ -199,6 +206,10 @@ describe("Fetchstrings test", () => {
   });
   it("TestAPI welcome", async () => {
     assert(await throwsError(testAPI.welcome("smile")));
+  });
+  it("TestAPI token", async () => {
+    const token = "asdf";
+    assert.equal((await testAPI.token(token)).data, token);
   });
 
   it("Close express server", () => {

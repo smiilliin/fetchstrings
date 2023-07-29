@@ -34,10 +34,7 @@ class FetchStrings {
     return new Promise<IStrings>((resolve) => {
       fetch(`${this.host}/strings/${lang}.json`)
         .then(async (res) => {
-          if (
-            res.ok &&
-            res.headers.get("content-type")?.includes("application/json")
-          ) {
+          if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
             const strings = await res.json();
 
             resolve(strings);
@@ -127,9 +124,12 @@ class BaseAPI {
   }
   private async sendToBody(path: string, data: IData, option: RequestInit) {
     option.body = JSON.stringify(data);
-    option.headers = {
-      "Content-Type": "application/json",
-    };
+    option.headers = Object.assign(
+      {
+        "Content-Type": "application/json",
+      },
+      option.headers
+    );
     return this.strings.fetchStrings(path, option);
   }
   private async sendToURL(path: string, data: IData, option: RequestInit) {
