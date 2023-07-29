@@ -193,7 +193,7 @@ describe("Fetchstrings test", () => {
       return this.get("/welcome", { name: name });
     }
     async token(token: string): Promise<IData> {
-      return this.post("/token", {}, { headers: { authorization: token } });
+      return this.post<IData>("/token", {}, { headers: { authorization: token } });
     }
   }
   let testAPI: TestAPI;

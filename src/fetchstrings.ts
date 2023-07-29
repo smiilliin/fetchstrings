@@ -72,7 +72,7 @@ class FetchStrings {
    * @param option Request option
    * @returns response data or UNKNOWN ERROR
    */
-  async fetchStrings(path: string, option: RequestInit): Promise<IError | any> {
+  async fetchStrings<T>(path: string, option: RequestInit): Promise<T> {
     if (!this.loaded) console.log("Fetchstring Warning: this class not loaded");
 
     const res = await fetch(`${this.host}${path}`, option);
@@ -122,7 +122,7 @@ class BaseAPI {
   async load(lang: string) {
     return this.strings.loadStrings(lang);
   }
-  private async sendToBody(path: string, data: IData, option: RequestInit) {
+  private async sendToBody<T>(path: string, data: IData, option: RequestInit): Promise<T> {
     option.body = JSON.stringify(data);
     option.headers = Object.assign(
       {
@@ -130,11 +130,11 @@ class BaseAPI {
       },
       option.headers
     );
-    return this.strings.fetchStrings(path, option);
+    return this.strings.fetchStrings<T>(path, option);
   }
-  private async sendToURL(path: string, data: IData, option: RequestInit) {
+  private async sendToURL<T>(path: string, data: IData, option: RequestInit): Promise<T> {
     path = path + "?" + new URLSearchParams(data).toString();
-    return this.strings.fetchStrings(path, option);
+    return this.strings.fetchStrings<T>(path, option);
   }
   /**
    * GET request
@@ -143,10 +143,10 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async get(path: string, data: IData, option?: RequestInit) {
+  protected async get<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
     option = option ? option : {};
     option.method = "GET";
-    return this.sendToURL(path, data, option);
+    return this.sendToURL<T>(path, data, option);
   }
   /**
    * POST request
@@ -155,10 +155,10 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async post(path: string, data: IData, option?: RequestInit) {
+  protected async post<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
     option = option ? option : {};
     option.method = "POST";
-    return this.sendToBody(path, data, option);
+    return this.sendToBody<T>(path, data, option);
   }
   /**
    * PUT request
@@ -167,10 +167,10 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async put(path: string, data: IData, option?: RequestInit) {
+  protected async put<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
     option = option ? option : {};
     option.method = "PUT";
-    return this.sendToBody(path, data, option);
+    return this.sendToBody<T>(path, data, option);
   }
   /**
    * DELETE request
@@ -179,10 +179,10 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async delete(path: string, data: IData, option?: RequestInit) {
+  protected async delete<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
     option = option ? option : {};
     option.method = "DELETE";
-    return this.sendToBody(path, data, option);
+    return this.sendToBody<T>(path, data, option);
   }
 }
 
