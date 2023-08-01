@@ -21,10 +21,6 @@ const app = express();
 
 app.use(express.json());
 
-const strings = new Strings();
-
-strings.use(app);
-
 app.post("/", (req, res) => {
   const { id } = req.body;
 
@@ -38,6 +34,8 @@ app.post("/", (req, res) => {
     data: "hello world!",
   });
 });
+
+new Strings(app);
 
 app.listen(3000, () => {
   console.log("Run!");

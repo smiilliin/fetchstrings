@@ -50,9 +50,7 @@ describe("Fetchstrings test", () => {
     res.status(200).send({ data: token || "" });
   });
 
-  const strings = new Strings("./test/strings");
-
-  strings.use(app);
+  new Strings(app, "./test/strings");
 
   let server: any;
   let port: number;
@@ -190,7 +188,7 @@ describe("Fetchstrings test", () => {
       return this.get("/admin", { name: name });
     }
     async welcome(name: string) {
-      return this.get("/welcome", { name: name });
+      return this.post("/welcome", { name: name });
     }
     async token(token: string): Promise<IData> {
       return this.post<IData>("/token", {}, { headers: { authorization: token } });
