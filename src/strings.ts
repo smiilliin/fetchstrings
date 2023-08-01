@@ -1,26 +1,18 @@
 import express from "express";
 
 class Strings {
-  router: express.Router;
-
   /**
    * Strings constructor
+   * @param app express app
    * @param stringsPath strings directory path
    */
-  constructor(stringsPath: string = "./strings") {
-    this.router = express.Router();
-    this.router.use(
+  constructor(app: express.Express, stringsPath: string = "./src/strings") {
+    app.use(
+      "/strings",
       express.static(stringsPath, {
         extensions: ["json"],
       })
     );
-  }
-  /**
-   * Use strings router
-   * @param app Express app
-   */
-  use(app: express.Express) {
-    app.use("/strings", this.router);
   }
 }
 
