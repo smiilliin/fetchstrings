@@ -34,7 +34,10 @@ class FetchStrings {
     return new Promise<IStrings>((resolve) => {
       fetch(`${this.host}/strings/${lang}.json`)
         .then(async (res) => {
-          if (res.ok && res.headers.get("content-type")?.includes("application/json")) {
+          if (
+            res.ok &&
+            res.headers.get("content-type")?.includes("application/json")
+          ) {
             const strings = await res.json();
 
             resolve(strings);
@@ -122,7 +125,11 @@ class BaseAPI {
   async load(lang: string) {
     return this.strings.loadStrings(lang);
   }
-  private async sendToBody<T>(path: string, data: IData, option: RequestInit): Promise<T> {
+  private async sendToBody<T>(
+    path: string,
+    data: IData,
+    option: RequestInit
+  ): Promise<T> {
     option.body = JSON.stringify(data);
     option.headers = Object.assign(
       {
@@ -132,7 +139,11 @@ class BaseAPI {
     );
     return this.strings.fetchStrings<T>(path, option);
   }
-  private async sendToURL<T>(path: string, data: IData, option: RequestInit): Promise<T> {
+  private async sendToURL<T>(
+    path: string,
+    data: IData,
+    option: RequestInit
+  ): Promise<T> {
     path = path + "?" + new URLSearchParams(data).toString();
     return this.strings.fetchStrings<T>(path, option);
   }
@@ -143,7 +154,11 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async get<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
+  protected async get<T>(
+    path: string,
+    data: IData,
+    option?: RequestInit
+  ): Promise<T> {
     option = option ? option : {};
     option.method = "GET";
     return this.sendToURL<T>(path, data, option);
@@ -155,7 +170,11 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async post<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
+  protected async post<T>(
+    path: string,
+    data: IData,
+    option?: RequestInit
+  ): Promise<T> {
     option = option ? option : {};
     option.method = "POST";
     return this.sendToBody<T>(path, data, option);
@@ -167,9 +186,29 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async put<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
+  protected async put<T>(
+    path: string,
+    data: IData,
+    option?: RequestInit
+  ): Promise<T> {
     option = option ? option : {};
     option.method = "PUT";
+    return this.sendToBody<T>(path, data, option);
+  }
+  /**
+   * PATCH request
+   * @param path path
+   * @param data data
+   * @param option request option
+   * @returns data
+   */
+  protected async patch<T>(
+    path: string,
+    data: IData,
+    option?: RequestInit
+  ): Promise<T> {
+    option = option ? option : {};
+    option.method = "PATCH";
     return this.sendToBody<T>(path, data, option);
   }
   /**
@@ -179,7 +218,11 @@ class BaseAPI {
    * @param option request option
    * @returns data
    */
-  protected async delete<T>(path: string, data: IData, option?: RequestInit): Promise<T> {
+  protected async delete<T>(
+    path: string,
+    data: IData,
+    option?: RequestInit
+  ): Promise<T> {
     option = option ? option : {};
     option.method = "DELETE";
     return this.sendToBody<T>(path, data, option);
