@@ -1,6 +1,6 @@
 {
   "name": "fetchstrings",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "fetch with multiple language strings",
   "main": "dist/fetchstrings.js",
   "scripts": {

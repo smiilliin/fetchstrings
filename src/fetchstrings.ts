@@ -76,8 +76,6 @@ class FetchStrings {
    * @returns response data or UNKNOWN ERROR
    */
   async fetchStrings<T>(path: string, option: RequestInit): Promise<T> {
-    if (!this.loaded) console.log("Fetchstring Warning: this class not loaded");
-
     const res = await fetch(`${this.host}${path}`, option);
     let data: IError | any;
 
