@@ -10,6 +10,12 @@ interface IData {
   [key: string]: any;
 }
 
+class StringsError extends Error {
+  constructor(name: string, message: string) {
+    super(message);
+    this.name = name;
+  }
+}
 class FetchStrings {
   host: string;
   lang: string = "en";
@@ -83,10 +89,10 @@ class FetchStrings {
       try {
         data = await res.json();
       } catch (err: any) {
-        throw new Error(this.strings["UNKNOWN_ERROR"]);
+        throw new StringsError("UNKNOWN_ERROR", this.strings["UNKNOWN_ERROR"]);
       }
     } else {
-      throw new Error(this.strings["UNKNOWN_ERROR"]);
+      throw new StringsError("UNKNOWN_ERROR", this.strings["UNKNOWN_ERROR"]);
     }
 
     if (!res.ok) {
@@ -95,10 +101,10 @@ class FetchStrings {
       const reasonText = this.strings[reason];
 
       if (!reasonText) {
-        throw new Error(this.strings["UNKNOWN_ERROR"]);
+        throw new StringsError("UNKNOWN_ERROR", this.strings["UNKNOWN_ERROR"]);
       }
 
-      throw new Error(this.strings[reason]);
+      throw new StringsError(reason, this.strings[reason]);
     } else {
       return data;
     }

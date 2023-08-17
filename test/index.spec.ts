@@ -92,7 +92,10 @@ describe("Fetchstrings test", () => {
     let error = false;
     try {
       await callback;
-    } catch {
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.name, err.message);
+      }
       error = true;
     }
 
@@ -191,7 +194,11 @@ describe("Fetchstrings test", () => {
       return this.post("/welcome", { name: name });
     }
     async token(token: string): Promise<IData> {
-      return this.post<IData>("/token", {}, { headers: { authorization: token } });
+      return this.post<IData>(
+        "/token",
+        {},
+        { headers: { authorization: token } }
+      );
     }
   }
   let testAPI: TestAPI;
