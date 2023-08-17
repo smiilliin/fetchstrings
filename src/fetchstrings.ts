@@ -101,7 +101,7 @@ class FetchStrings {
       const reasonText = this.strings[reason];
 
       if (!reasonText) {
-        throw new StringsError("UNKNOWN_ERROR", this.strings["UNKNOWN_ERROR"]);
+        throw new StringsError(reason, this.strings["UNKNOWN_ERROR"]);
       }
 
       throw new StringsError(reason, this.strings[reason]);
